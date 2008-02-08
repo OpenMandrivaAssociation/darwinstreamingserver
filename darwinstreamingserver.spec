@@ -17,9 +17,13 @@ Source5:	dss.bz2
 Source6:	dss-proxy.bz2
 Patch0:		DSS-v5_0_3_2-Config.diff
 Patch1:		darwinstreamingserver-5.5.5-build_optimizer.patch
-Patch2:		DSS-v5_0_3_2-x86_64.diff
+# Disabled while we're ExclusiveArch i586... - AdamW 2008/02
+#Patch2:	DSS-v5_0_3_2-x86_64.diff
 BuildRequires:	libstdc++-devel
 BuildRoot:	%{_tmppath}/%{name}-buildroot
+# Code is extensively broken for x86-64 and no-one seems interested
+# in fixing it - AdamW 2008/02
+ExclusiveArch:	%{ix86}
 Requires(pre,post,preun,postun):	rpm-helper
 
 %description
@@ -114,7 +118,7 @@ License:	APSL 2.0
 %setup -q -n %{oname}%{version}-Source
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
+#%patch2 -p1
 
 cat > defaultPaths.h << EOF
 # define DEFAULTPATHS_DIRECTORY_SEPARATOR	"/"
