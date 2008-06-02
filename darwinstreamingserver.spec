@@ -126,7 +126,7 @@ cat > defaultPaths.h << EOF
 # define DEFAULTPATHS_ETC_DIR_OLD		"%{_sysconfdir}/"
 # define DEFAULTPATHS_SSM_DIR			"%{_libdir}/dss/"
 # define DEFAULTPATHS_LOG_DIR			"/var/log/dss/"
-# define DEFAULTPATHS_MOVIES_DIR        "%{_localstatedir}/dss/"
+# define DEFAULTPATHS_MOVIES_DIR        "%{_localstatedir}/lib/dss/"
 # define DEFAULTPATHS_PID_DIR           "/var/run/dss/"
 EOF
 
@@ -147,9 +147,9 @@ install -d %{buildroot}%{_sysconfdir}/dss
 install -d %{buildroot}%{_sysconfdir}/logrotate.d
 install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}%{_libdir}/dss
-install -d %{buildroot}%{_localstatedir}/dss/Movies/http
-install -d %{buildroot}%{_localstatedir}/dss/AdminHtml
-install -d %{buildroot}%{_localstatedir}/dss/Playlists
+install -d %{buildroot}%{_localstatedir}/lib/dss/Movies/http
+install -d %{buildroot}%{_localstatedir}/lib/dss/AdminHtml
+install -d %{buildroot}%{_localstatedir}/lib/dss/Playlists
 install -d %{buildroot}/var/log/dss
 install -d %{buildroot}%{_iconsdir}
 install -d %{buildroot}%{_miconsdir}
@@ -213,10 +213,10 @@ bzcat %{SOURCE6} > %{buildroot}%{_sysconfdir}/logrotate.d/%{name}-Proxy
 # so, some coder needs to fix the source. As the server is run
 # under the dss user, there might be some problems...
 
-ln -s %{_docdir}/%{name}-%{version} %{buildroot}%{_localstatedir}/dss/Docs
-ln -s ../../../etc/dss %{buildroot}%{_localstatedir}/dss/Config
-ln -s ../../../usr/lib/dss %{buildroot}%{_localstatedir}/dss/Modules
-ln -s ../../log/dss %{buildroot}%{_localstatedir}/dss/Logs
+ln -s %{_docdir}/%{name}-%{version} %{buildroot}%{_localstatedir}/lib/dss/Docs
+ln -s ../../../etc/dss %{buildroot}%{_localstatedir}/lib/dss/Config
+ln -s ../../../usr/lib/dss %{buildroot}%{_localstatedir}/lib/dss/Modules
+ln -s ../../log/dss %{buildroot}%{_localstatedir}/lib/dss/Logs
 
 # provide ghost logs...
 touch %{buildroot}/var/log/dss/Error.log
@@ -229,7 +229,7 @@ touch %{buildroot}/var/log/dss/StreamingProxy.log
 strip %{buildroot}%{_libdir}/dss/*
 
 %pre
-%_pre_useradd dss %{_localstatedir}/dss /bin/sh
+%_pre_useradd dss %{_localstatedir}/lib/dss /bin/sh
 
 %post
 %_post_service %{name}
@@ -287,13 +287,13 @@ strip %{buildroot}%{_libdir}/dss/*
 %attr(0755,root,root) %{_libdir}/dss/QTSSRawFileModule
 %attr(0755,root,root) %{_libdir}/dss/QTSSRefMovieModule
 %attr(0755,root,root) %{_libdir}/dss/QTSSSpamDefenseModule
-%dir %attr(0755, root, root) %{_localstatedir}/dss/Movies
-%dir %attr(0755, root, root) %{_localstatedir}/dss/Movies/http
-%dir %attr(0755, root, root) %{_localstatedir}/dss/Playlists
-%dir %attr(0755, root, root) %{_localstatedir}/dss/Docs
-%dir %attr(0755, root, root) %{_localstatedir}/dss/Config
-%dir %attr(0755, root, root) %{_localstatedir}/dss/Modules
-%dir %attr(0755, dss, dss) %{_localstatedir}/dss/Logs
+%dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Movies
+%dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Movies/http
+%dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Playlists
+%dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Docs
+%dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Config
+%dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Modules
+%dir %attr(0755, dss, dss) %{_localstatedir}/lib/dss/Logs
 %dir %attr(0755, dss, dss) /var/log/dss
 %attr(0644,dss,dss) %verify(not md5 size mtime) %ghost /var/log/dss/Error.log
 %attr(0644,dss,dss) %verify(not md5 size mtime) %ghost /var/log/dss/StreamingServer.log
@@ -311,8 +311,8 @@ strip %{buildroot}%{_libdir}/dss/*
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/streamingproxy.conf.default
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/%{name}-Proxy
 %dir %attr(0755, root, root) %{_sbindir}/StreamingProxy
-%dir %attr(0755, root, root) %{_localstatedir}/dss/Config
-%dir %attr(0755, dss, dss) %{_localstatedir}/dss/Logs
+%dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Config
+%dir %attr(0755, dss, dss) %{_localstatedir}/lib/dss/Logs
 %dir %attr(0755, dss, dss) /var/log/dss
 %attr(0644,dss,dss) %verify(not md5 size mtime) %ghost /var/log/dss/StreamingProxy.log
 
