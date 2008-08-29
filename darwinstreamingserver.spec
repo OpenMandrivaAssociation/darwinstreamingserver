@@ -2,28 +2,31 @@
 
 Summary:	Apple's Darwin Streaming Server
 Name:		darwinstreamingserver
-Version:	5.5.5
-Release:	%mkrel 3
+Version:	6.0.3
+Release:	%{mkrel 1}
 License:	APSL 2.0
 Group:		System/Servers
 URL:		http://developer.apple.com/opensource/server/streaming/index.html
-# Download requires annoying registration, so no point having the URL.
-# Username RegistrationIsAnnoying, password reallyannoying.
-# - AdamW 2008/02
-Source0:	%{oname}%{version}-Source.tar.gz
+# Upstream download is uncompressed, compress manually - AdamW 2008/08
+Source0:	http://dss.macosforge.org/downloads/%{oname}%{version}-Source.tar.lzma
 Source1:	dss.init.bz2
 Source2:	dss-proxy.init.bz2
 Source5:	dss.bz2
 Source6:	dss-proxy.bz2
-Patch0:		DSS-v5_0_3_2-Config.diff
-Patch1:		darwinstreamingserver-5.5.5-build_optimizer.patch
-# Disabled while we're ExclusiveArch i586... - AdamW 2008/02
-#Patch2:	DSS-v5_0_3_2-x86_64.diff
+Patch0:		DSS-v6_0_3-Config.diff
+# Via http://dss.macosforge.org/trac/ticket/6
+# Location http://www.abrahamsson.com/dss-6.0.3.patch
+# Fixes various bugs and build errors for Linux, also fixes build for
+# x86-64. Author Sverker Abrahamsson.
+Patch1:		dss-6.0.3.patch
+# Also via http://dss.macosforge.org/trac/ticket/6
+# Fixes more minor compilation issues, memory leaks, deadlock, and
+# bug on x86-64 preventing any requests from outside localhost. Author
+# Horace Hsieh.
+Patch2:		dss-hh-20080728-1.patch
+Patch3:		darwinstreamingserver-6.0.3-build_optimizer.patch
 BuildRequires:	libstdc++-devel
 BuildRoot:	%{_tmppath}/%{name}-buildroot
-# Code is extensively broken for x86-64 and no-one seems interested
-# in fixing it - AdamW 2008/02
-ExclusiveArch:	%{ix86}
 Requires(pre,post,preun,postun):	rpm-helper
 
 %description
@@ -118,7 +121,8 @@ License:	APSL 2.0
 %setup -q -n %{oname}%{version}-Source
 %patch0 -p1
 %patch1 -p1
-#%patch2 -p1
+%patch2 -p1
+%patch3 -p1
 
 cat > defaultPaths.h << EOF
 # define DEFAULTPATHS_DIRECTORY_SEPARATOR	"/"
@@ -131,7 +135,7 @@ cat > defaultPaths.h << EOF
 EOF
 
 %build
-export RPM_OPT_FLAGS="%{optflags} -fPIC -Wall"
+export RPM_OPT_FLAGS="%{optflags} -Wall"
 export ARCH="%{_target_cpu}"
 # parallel build hack... (it sucks)
 # export JOBS=$(echo %{_smp_mflags}|cut -dj -f2)
@@ -267,7 +271,7 @@ strip %{buildroot}%{_libdir}/dss/*
 %doc Documentation/readme.txt
 %doc Documentation/ReliableRTP_WhitePaper.rtf
 %doc Documentation/RTSP_Over_HTTP.pdf
-%doc Documentation/SourceCodeFAQ.html
+%doc Documentation/FAQ.html
 %attr(0755,root,root) %{_initrddir}/%{name}
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/qtaccess
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/qtgroups
