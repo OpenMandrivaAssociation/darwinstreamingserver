@@ -3,7 +3,7 @@
 Summary:	Apple's Darwin Streaming Server
 Name:		darwinstreamingserver
 Version:	6.0.3
-Release:	%{mkrel 1}
+Release:	%{mkrel 2}
 License:	APSL 2.0
 Group:		System/Servers
 URL:		http://developer.apple.com/opensource/server/streaming/index.html
@@ -13,6 +13,8 @@ Source1:	dss.init.bz2
 Source2:	dss-proxy.init.bz2
 Source5:	dss.bz2
 Source6:	dss-proxy.bz2
+Source7:	dss-setup-script.lzma
+Source8:	dss.webadmin.init.lzma
 Patch0:		DSS-v6_0_3-Config.diff
 # Via http://dss.macosforge.org/trac/ticket/6
 # Location http://www.abrahamsson.com/dss-6.0.3.patch
@@ -116,22 +118,36 @@ License:	APSL 2.0
   Example: "./QTTrackInfo -T stco /movies/mystery.mov 3" dumps the
   chunk offset sample table in track 3.
 
-%prep
+%package	webadmin
+Summary:	Apple's Darwin Streaming Server web admin interface
+Group:		System/Servers
+License:	APSL 2.0
+Requires:	%{name} = %{version}-%{release}
 
+%description	webadmin
+Darwin Streaming Server lets you stream digital video on the
+Internet using industry-standard Internet protocols RTP and RTSP.
+This package contains the web-based administration interface for
+Darwin Streaming Server.
+
+%prep
 %setup -q -n %{oname}%{version}-Source
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+# fix qtpasswd resetting ownership of its config files to root - AdamW
+# 2008/11
+sed -i -e 's,"qtss","dss",g' qtpasswd.tproj/QTSSPasswd.cpp
 
 cat > defaultPaths.h << EOF
 # define DEFAULTPATHS_DIRECTORY_SEPARATOR	"/"
 # define DEFAULTPATHS_ETC_DIR			"%{_sysconfdir}/dss/"
 # define DEFAULTPATHS_ETC_DIR_OLD		"%{_sysconfdir}/"
 # define DEFAULTPATHS_SSM_DIR			"%{_libdir}/dss/"
-# define DEFAULTPATHS_LOG_DIR			"/var/log/dss/"
-# define DEFAULTPATHS_MOVIES_DIR        "%{_localstatedir}/lib/dss/"
-# define DEFAULTPATHS_PID_DIR           "/var/run/dss/"
+# define DEFAULTPATHS_LOG_DIR			"%{_logdir}/dss/"
+# define DEFAULTPATHS_MOVIES_DIR		"%{_localstatedir}/lib/dss/"
+# define DEFAULTPATHS_PID_DIR			"/var/run/dss/"
 EOF
 
 %build
@@ -152,9 +168,8 @@ install -d %{buildroot}%{_sysconfdir}/logrotate.d
 install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}%{_libdir}/dss
 install -d %{buildroot}%{_localstatedir}/lib/dss/Movies/http
-install -d %{buildroot}%{_localstatedir}/lib/dss/AdminHtml
 install -d %{buildroot}%{_localstatedir}/lib/dss/Playlists
-install -d %{buildroot}/var/log/dss
+install -d %{buildroot}%{_logdir}/dss
 install -d %{buildroot}%{_iconsdir}
 install -d %{buildroot}%{_miconsdir}
 install -d %{buildroot}%{_liconsdir}
@@ -167,6 +182,10 @@ install -m0755 StreamingProxy.tproj/StreamingProxy %{buildroot}%{_sbindir}/
 install -m0755 PlaylistBroadcaster.tproj/PlaylistBroadcaster %{buildroot}%{_bindir}/
 install -m0755 MP3Broadcaster/MP3Broadcaster %{buildroot}%{_bindir}/
 install -m0755 qtpasswd.tproj/qtpasswd %{buildroot}%{_bindir}/
+
+# setup script (to create an admin user, ripped from the upstream
+# install script) - AdamW 2008/11
+lzcat %{SOURCE7} > %{buildroot}%{_sbindir}/dss-setup
 
 # NOTE! the StreamingLoadTool is not yet released as source code
 #install -m755 StreamingLoadTool %{buildroot}%{_bindir}/
@@ -198,6 +217,25 @@ install -m0644 qtaccess %{buildroot}%{_sysconfdir}/dss/
 install -m0644 qtusers %{buildroot}%{_sysconfdir}/dss/
 install -m0644 qtgroups %{buildroot}%{_sysconfdir}/dss/
 
+# web admin
+install -m0755 WebAdmin/src/streamingadminserver.pl %{buildroot}%{_bindir}/streamingadminserver
+sed -i -e 's,/etc/streaming,%{_sysconfdir}/dss,g' %{buildroot}%{_bindir}/streamingadminserver
+sed -i -e 's,/var/streaming,%{_localstatedir}/lib/dss,g' %{buildroot}%{_bindir}/streamingadminserver
+sed -i -e 's,/var/streaming/logs,%{_logdir}/dss,g' %{buildroot}%{_bindir}/streamingadminserver
+sed -i -e 's,/usr/local,%{_bindir},g' %{buildroot}%{_bindir}/streamingadminserver
+sed -i -e 's,"qtss","dss",g' %{buildroot}%{_bindir}/streamingadminserver
+
+install -m0644 WebAdmin/streamingadminserver.conf %{buildroot}%{_sysconfdir}/dss/streamingadminserver.conf
+sed -i -e 's,/Library/QuickTimeStreaming/AdminHtml,%{_localstatedir}/lib/dss/AdminHtml,g' %{buildroot}%{_sysconfdir}/dss/streamingadminserver.conf
+sed -i -e 's,/Library/QuickTimeStreaming/Playlists,%{_localstatedir}/lib/dss/playlists,g' %{buildroot}%{_sysconfdir}/dss/streamingadminserver.conf
+sed -i -e 's,/usr/sbin/QuickTimeStreamingServer,%{_sbindir}/DarwinStreamingServer,g' %{buildroot}%{_sysconfdir}/dss/streamingadminserver.conf
+sed -i -e 's,/Library/QuickTimeStreaming/Logs/streamingadminserver.log,%{_logdir}/dss/streamingadminserver.log,g' %{buildroot}%{_sysconfdir}/dss/streamingadminserver.conf
+
+mkdir -p %{buildroot}%{_localstatedir}/lib/dss
+mkdir -p %{buildroot}%{_localstatedir}/lib/dss/playlists
+cp -R WebAdmin/WebAdminHtml/ %{buildroot}%{_localstatedir}/lib/dss
+mv %{buildroot}%{_localstatedir}/lib/dss/WebAdminHtml %{buildroot}%{_localstatedir}/lib/dss/AdminHtml
+
 # install manuals
 install -m0644 Documentation/broadcasterctl.1 %{buildroot}%{_mandir}/man1/
 install -m0644 Documentation/MP3Broadcaster.1 %{buildroot}%{_mandir}/man1/
@@ -208,6 +246,7 @@ install -m0644 Documentation/MP3Broadcaster.1 %{buildroot}%{_mandir}/man1/
 # sys 5 scripts
 bzcat %{SOURCE1} > %{buildroot}%{_initrddir}/%{name}
 bzcat %{SOURCE2} > %{buildroot}%{_initrddir}/%{name}-Proxy
+lzcat %{SOURCE8} > %{buildroot}%{_initrddir}/streamingadminserver
 
 # logrotate stuff
 bzcat %{SOURCE5} > %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
@@ -222,12 +261,25 @@ ln -s ../../../etc/dss %{buildroot}%{_localstatedir}/lib/dss/Config
 ln -s ../../../usr/lib/dss %{buildroot}%{_localstatedir}/lib/dss/Modules
 ln -s ../../log/dss %{buildroot}%{_localstatedir}/lib/dss/Logs
 
+# install instructions
+
+#installation instructions
+cat > README.urpmi << EOF 
+After installing darwinstreamingserver, please run 'dss-setup' as root
+to create an admin user, before starting the 'darwinstreamingserver'
+service. The web interface is the most convenient way to configure DSS:
+to use it, install the darwinstreamingserver-webadmin package and then
+start the 'streamingadminserver' service. You can then connect to
+http://127.0.0.1:1220/ in any web browser to configure the server.
+EOF
+
 # provide ghost logs...
-touch %{buildroot}/var/log/dss/Error.log
-touch %{buildroot}/var/log/dss/StreamingServer.log
-touch %{buildroot}/var/log/dss/mp3_access.log
-touch %{buildroot}/var/log/dss/server_status
-touch %{buildroot}/var/log/dss/StreamingProxy.log
+touch %{buildroot}%{_logdir}/dss/Error.log
+touch %{buildroot}%{_logdir}/dss/StreamingServer.log
+touch %{buildroot}%{_logdir}/dss/mp3_access.log
+touch %{buildroot}%{_logdir}/dss/server_status
+touch %{buildroot}%{_logdir}/dss/StreamingProxy.log
+touch %{buildroot}%{_logdir}/dss/streamingadminserver.log
 
 # strip the modules
 strip %{buildroot}%{_libdir}/dss/*
@@ -255,7 +307,7 @@ strip %{buildroot}%{_libdir}/dss/*
 
 %files
 %defattr(-, root, root)
-%doc APPLE_LICENSE ReleaseNotes.txt
+%doc APPLE_LICENSE ReleaseNotes.txt README.urpmi
 %doc APIModules/QTSSRawFileModule.bproj/README-RawFileModule
 %doc APIModules/QTSSRawFileModule.bproj/sampleredirect.raw
 %doc Documentation/3rdPartyAcknowledgements.rtf
@@ -273,9 +325,9 @@ strip %{buildroot}%{_libdir}/dss/*
 %doc Documentation/RTSP_Over_HTTP.pdf
 %doc Documentation/FAQ.html
 %attr(0755,root,root) %{_initrddir}/%{name}
-%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/qtaccess
-%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/qtgroups
-%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/qtusers
+%config(noreplace) %attr(0640,dss,dss) %{_sysconfdir}/dss/qtaccess
+%config(noreplace) %attr(0640,dss,dss) %{_sysconfdir}/dss/qtgroups
+%config(noreplace) %attr(0640,dss,dss) %{_sysconfdir}/dss/qtusers
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/relayconfig.xml
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/relayconfig.xml.default
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/streamingserver.xml
@@ -285,6 +337,7 @@ strip %{buildroot}%{_libdir}/dss/*
 %dir %attr(0755, root, root) %{_bindir}/PlaylistBroadcaster
 %dir %attr(0755, root, root) %{_bindir}/qtpasswd
 %dir %attr(0755, root, root) %{_sbindir}/DarwinStreamingServer
+%dir %attr(0755, root, root) %{_sbindir}/dss-setup
 %dir %attr(0755, root, root) %{_libdir}/dss
 %dir %attr(0755, dss, dss) /var/run/dss
 %attr(0755,root,root) %{_libdir}/dss/QTSSDemoAuthorizationModule
@@ -298,11 +351,11 @@ strip %{buildroot}%{_libdir}/dss/*
 %dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Config
 %dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Modules
 %dir %attr(0755, dss, dss) %{_localstatedir}/lib/dss/Logs
-%dir %attr(0755, dss, dss) /var/log/dss
-%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost /var/log/dss/Error.log
-%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost /var/log/dss/StreamingServer.log
-%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost /var/log/dss/mp3_access.log
-%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost /var/log/dss/server_status
+%dir %attr(0755, dss, dss) %{_logdir}/dss
+%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost %{_logdir}/dss/Error.log
+%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost %{_logdir}/dss/StreamingServer.log
+%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost %{_logdir}/dss/mp3_access.log
+%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost %{_logdir}/dss/server_status
 %attr(0644,root,root) %{_mandir}/man1/broadcasterctl.1*
 %attr(0644,root,root) %{_mandir}/man1/MP3Broadcaster.1*
 
@@ -317,8 +370,8 @@ strip %{buildroot}%{_libdir}/dss/*
 %dir %attr(0755, root, root) %{_sbindir}/StreamingProxy
 %dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Config
 %dir %attr(0755, dss, dss) %{_localstatedir}/lib/dss/Logs
-%dir %attr(0755, dss, dss) /var/log/dss
-%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost /var/log/dss/StreamingProxy.log
+%dir %attr(0755, dss, dss) %{_logdir}/dss
+%attr(0644,dss,dss) %verify(not md5 size mtime) %ghost %{_logdir}/dss/StreamingProxy.log
 
 %files utils
 %defattr(-, root, root)
@@ -332,3 +385,11 @@ strip %{buildroot}%{_libdir}/dss/*
 %dir %attr(0755, root, root) %{_bindir}/QTSDPGen
 %dir %attr(0755, root, root) %{_bindir}/QTTrackInfo
 
+%files webadmin
+%defattr(-, root, root)
+%{_bindir}/streamingadminserver
+%{_localstatedir}/lib/dss/AdminHtml
+%{_localstatedir}/lib/dss/playlists
+%attr(0755,root,root) %{_initrddir}/streamingadminserver
+%config(noreplace) %{_sysconfdir}/dss/streamingadminserver.conf
+%attr(0644,root,root) %verify(not md5 size mtime) %ghost %{_logdir}/dss/streamingadminserver.log
