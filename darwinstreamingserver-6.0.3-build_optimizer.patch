@@ -1,0 +1,396 @@
+diff -Naur DSS-v5_0_3_2/APIModules/QTSSRawFileModule.bproj/Makefile.POSIX DSS-v5_0_3_2.oden/APIModules/QTSSRawFileModule.bproj/Makefile.POSIX
+--- DSS-v5_0_3_2/APIModules/QTSSRawFileModule.bproj/Makefile.POSIX	2002-05-02 05:41:19.000000000 +0200
++++ DSS-v5_0_3_2.oden/APIModules/QTSSRawFileModule.bproj/Makefile.POSIX	2005-05-04 19:53:01.805165865 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) $(SHARED) $(MODULE_LIBS) ../../CommonUtilitiesLib/libCommonUtilitiesLib.a ../../QTFileLib/libQTFileLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/APIModules/QTSSRefMovieModule/Makefile.POSIX DSS-v5_0_3_2.oden/APIModules/QTSSRefMovieModule/Makefile.POSIX
+--- DSS-v5_0_3_2/APIModules/QTSSRefMovieModule/Makefile.POSIX	2002-05-01 00:39:04.000000000 +0200
++++ DSS-v5_0_3_2.oden/APIModules/QTSSRefMovieModule/Makefile.POSIX	2005-05-04 19:52:31.480469854 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) $(SHARED) $(MODULE_LIBS) ../../CommonUtilitiesLib/libCommonUtilitiesLib.a ../../QTFileLib/libQTFileLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/APIStubLib/makefile.apistublib.POSIX DSS-v5_0_3_2.oden/APIStubLib/makefile.apistublib.POSIX
+--- DSS-v5_0_3_2/APIStubLib/makefile.apistublib.POSIX	2000-01-27 03:09:04.000000000 +0100
++++ DSS-v5_0_3_2.oden/APIStubLib/makefile.apistublib.POSIX	2005-05-04 19:53:43.824130294 +0200
+@@ -5,10 +5,10 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(MACHDEFINES) -include ../PlatformHeader.h -g -Wall $(CFLAGSX)
++CCFLAGS += $(MACHDEFINES) -include ../PlatformHeader.h $(CFLAGSX)
+ LIBS = 
+ 
+-OPTIM = -O0
++OPTIM =
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DarwinStreamingSrvr6.0.3-Source/Buildit DarwinStreamingSrvr6.0.3-Source/Buildit.new
+--- DarwinStreamingSrvr6.0.3-Source/Buildit	2008-08-29 09:53:30.000000000 -0700
++++ DarwinStreamingSrvr6.0.3-Source/Buildit.new	2008-08-29 09:59:02.000000000 -0700
+@@ -54,7 +54,7 @@
+ fi
+ 
+ OSNAME=`uname`
+-HARDWARENAME=`uname -m`
++HARDWARENAME=$ARCH
+  
+ PLAT=$OSNAME.$HARDWARENAME
+ 
+@@ -71,7 +71,7 @@
+ 		LINKER='gcc'
+  		MAKE=make
+  		
+-		COMPILER_FLAGS="-D_REENTRANT -D__USE_POSIX -D__linuxppc__ -pipe"
++		COMPILER_FLAGS="-D_REENTRANT -D__USE_POSIX -D__linuxppc__ -pipe $RPM_OPT_FLAGS"
+         INCLUDE_FLAG="-include"
+ 		
+ 		CORE_LINK_LIBS="-lpthread -ldl -lstdc++ -lm -lcrypt"
+@@ -85,6 +85,11 @@
+ 		fi
+ 		;;		
+ 
++	Linux.k6 | \
++	Linux.athlon | \
++	Linux.amd64 | \
++	Linux.x86_64 | \
++	Linux.i386 | \
+ 	Linux.i586 | \
+ 	Linux.i686 | \
+ 	Linux.x86_64 )
+@@ -95,9 +100,9 @@
+  		MAKE=make
+  		
+ 		if [ "$PLAT" = "Linux.x86_64" ]; then
+-			COMPILER_FLAGS="-D_REENTRANT -D__USE_POSIX -D__linux__ -pipe -fPIC"
++			COMPILER_FLAGS="-D_REENTRANT -D__USE_POSIX -D__linux__ -pipe -fPIC $RPM_OPT_FLAGS"
+ 		else
+-			COMPILER_FLAGS="-D_REENTRANT -D__USE_POSIX -D__linux__ -pipe"
++			COMPILER_FLAGS="-D_REENTRANT -D__USE_POSIX -D__linux__ -pipe $RPM_OPT_FLAGS"
+ 		fi
+         INCLUDE_FLAG="-include"
+ 		
+@@ -119,7 +124,7 @@
+ 		LINKER='egcs'
+  		MAKE=make
+  		
+-		COMPILER_FLAGS="-D_REENTRANT -D__linux__ -Wno-multichar -pipe"
++		COMPILER_FLAGS="-D_REENTRANT -D__linux__ -Wno-multichar -pipe $RPM_OPT_FLAGS"
+         INCLUDE_FLAG="-include"
+ 		
+ 		CORE_LINK_LIBS="-lpthread -ldl -lm -lcrypt"
+diff -Naur DSS-v5_0_3_2/CommonUtilitiesLib/Makefile.POSIX DSS-v5_0_3_2.oden/CommonUtilitiesLib/Makefile.POSIX
+--- DSS-v5_0_3_2/CommonUtilitiesLib/Makefile.POSIX	2002-12-21 17:49:12.000000000 +0100
++++ DSS-v5_0_3_2.oden/CommonUtilitiesLib/Makefile.POSIX	2005-05-04 19:54:02.149550909 +0200
+@@ -6,10 +6,10 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h
+ 
+ # OPTIMIZATION
+-CCFLAGS += -O2
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/HTTPUtilitiesLib/Makefile.POSIX DSS-v5_0_3_2.oden/HTTPUtilitiesLib/Makefile.POSIX
+--- DSS-v5_0_3_2/HTTPUtilitiesLib/Makefile.POSIX	2002-02-28 03:46:01.000000000 +0100
++++ DSS-v5_0_3_2.oden/HTTPUtilitiesLib/Makefile.POSIX	2005-05-04 19:54:18.003914809 +0200
+@@ -1,9 +1,9 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(MACHDEFINES) -include ../PlatformHeader.h -g -Wall $(CFLAGSX)
++CCFLAGS += $(MACHDEFINES) -include ../PlatformHeader.h $(CFLAGSX)
+ 
+-OPTIM = -O2
++OPTIM =
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/Makefile.POSIX DSS-v5_0_3_2.oden/Makefile.POSIX
+--- DSS-v5_0_3_2/Makefile.POSIX	2002-12-18 15:37:28.000000000 +0100
++++ DSS-v5_0_3_2.oden/Makefile.POSIX	2005-05-04 19:58:39.517917561 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS)  -DDSS_USE_API_CALLBACKS -g -Wall -Wno-format-y2k $(INCLUDE_FLAG) PlatformHeader.h
++CCFLAGS += $(COMPILER_FLAGS)  -DDSS_USE_API_CALLBACKS -Wno-format-y2k $(INCLUDE_FLAG) PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib -lQTFileLib
+ 
+ # OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/QTFileLib/Makefile.POSIX DSS-v5_0_3_2.oden/QTFileLib/Makefile.POSIX
+--- DSS-v5_0_3_2/QTFileLib/Makefile.POSIX	2002-12-18 15:37:37.000000000 +0100
++++ DSS-v5_0_3_2.oden/QTFileLib/Makefile.POSIX	2005-05-04 19:55:01.223906834 +0200
+@@ -6,10 +6,10 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h
+ 
+ # OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/QTFileTools/QTFileTest.tproj/Makefile.POSIX DSS-v5_0_3_2.oden/QTFileTools/QTFileTest.tproj/Makefile.POSIX
+--- DSS-v5_0_3_2/QTFileTools/QTFileTest.tproj/Makefile.POSIX	2002-05-02 05:41:47.000000000 +0200
++++ DSS-v5_0_3_2.oden/QTFileTools/QTFileTest.tproj/Makefile.POSIX	2005-05-04 19:55:37.798746346 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib  -lQTFileExternalLib ../../CommonUtilitiesLib/libCommonUtilitiesLib.a ../../QTFileLib/libQTFileExternalLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/QTFileTools/QTRTPFileTest.tproj/Makefile.POSIX DSS-v5_0_3_2.oden/QTFileTools/QTRTPFileTest.tproj/Makefile.POSIX
+--- DSS-v5_0_3_2/QTFileTools/QTRTPFileTest.tproj/Makefile.POSIX	2002-05-02 05:41:47.000000000 +0200
++++ DSS-v5_0_3_2.oden/QTFileTools/QTRTPFileTest.tproj/Makefile.POSIX	2005-05-04 19:55:45.958933651 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib  -lQTFileExternalLib ../../CommonUtilitiesLib/libCommonUtilitiesLib.a ../../QTFileLib/libQTFileExternalLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/QTFileTools/QTRTPGen.tproj/Makefile.POSIX DSS-v5_0_3_2.oden/QTFileTools/QTRTPGen.tproj/Makefile.POSIX
+--- DSS-v5_0_3_2/QTFileTools/QTRTPGen.tproj/Makefile.POSIX	2002-05-02 05:41:48.000000000 +0200
++++ DSS-v5_0_3_2.oden/QTFileTools/QTRTPGen.tproj/Makefile.POSIX	2005-05-04 19:55:53.544107758 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib  -lQTFileExternalLib ../../CommonUtilitiesLib/libCommonUtilitiesLib.a ../../QTFileLib/libQTFileExternalLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/QTFileTools/QTSDPGen.tproj/Makefile.POSIX DSS-v5_0_3_2.oden/QTFileTools/QTSDPGen.tproj/Makefile.POSIX
+--- DSS-v5_0_3_2/QTFileTools/QTSDPGen.tproj/Makefile.POSIX	2002-05-02 05:41:48.000000000 +0200
++++ DSS-v5_0_3_2.oden/QTFileTools/QTSDPGen.tproj/Makefile.POSIX	2005-05-04 19:56:01.978301352 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib  -lQTFileExternalLib ../../CommonUtilitiesLib/libCommonUtilitiesLib.a ../../QTFileLib/libQTFileExternalLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/QTFileTools/QTSampleLister.tproj/Makefile.POSIX DSS-v5_0_3_2.oden/QTFileTools/QTSampleLister.tproj/Makefile.POSIX
+--- DSS-v5_0_3_2/QTFileTools/QTSampleLister.tproj/Makefile.POSIX	2002-05-02 05:41:49.000000000 +0200
++++ DSS-v5_0_3_2.oden/QTFileTools/QTSampleLister.tproj/Makefile.POSIX	2005-05-04 19:56:10.668500824 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib  -lQTFileExternalLib ../../CommonUtilitiesLib/libCommonUtilitiesLib.a ../../QTFileLib/libQTFileExternalLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/QTFileTools/QTTrackInfo.tproj/Makefile.POSIX DSS-v5_0_3_2.oden/QTFileTools/QTTrackInfo.tproj/Makefile.POSIX
+--- DSS-v5_0_3_2/QTFileTools/QTTrackInfo.tproj/Makefile.POSIX	2002-05-02 05:41:49.000000000 +0200
++++ DSS-v5_0_3_2.oden/QTFileTools/QTTrackInfo.tproj/Makefile.POSIX	2005-05-04 19:56:19.533704314 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib  -lQTFileExternalLib ../../CommonUtilitiesLib/libCommonUtilitiesLib.a ../../QTFileLib/libQTFileExternalLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/StreamingProxy.tproj/Makefile.POSIX DSS-v5_0_3_2.oden/StreamingProxy.tproj/Makefile.POSIX
+--- DSS-v5_0_3_2/StreamingProxy.tproj/Makefile.POSIX	2002-02-28 03:46:06.000000000 +0100
++++ DSS-v5_0_3_2.oden/StreamingProxy.tproj/Makefile.POSIX	2005-05-04 19:57:08.662832022 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS)
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+diff -Naur DSS-v5_0_3_2/qtpasswd.tproj/Makefile.POSIX DSS-v5_0_3_2.oden/qtpasswd.tproj/Makefile.POSIX
+--- DSS-v5_0_3_2/qtpasswd.tproj/Makefile.POSIX	2002-05-02 05:42:00.000000000 +0200
++++ DSS-v5_0_3_2.oden/qtpasswd.tproj/Makefile.POSIX	2005-05-04 19:57:58.842983878 +0200
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) ../CommonUtilitiesLib/libCommonUtilitiesLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+--- DarwinStreamingSrvr5.5.5-Source/APIModules/QTSSDemoAuthorizationModule.bproj/Makefile.POSIX	2005-05-03 23:26:12.000000000 -0700
++++ DarwinStreamingSrvr5.5.5-Source/APIModules/QTSSDemoAuthorizationModule.bproj/Makefile.POSIX.new	2008-02-07 18:31:41.000000000 -0800
+@@ -5,7 +5,7 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) $(SHARED) $(MODULE_LIBS) ../../CommonUtilitiesLib/libCommonUtilitiesLib.a 
+ 
+ #OPTIMIZATION
+--- DarwinStreamingSrvr5.5.5-Source/APIModules/QTSSSpamDefenseModule.bproj/Makefile.POSIX	2005-05-03 23:25:08.000000000 -0700
++++ DarwinStreamingSrvr5.5.5-Source/APIModules/QTSSSpamDefenseModule.bproj/Makefile.POSIX.new	2008-02-07 18:32:43.000000000 -0800
+@@ -5,7 +5,7 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) $(SHARED) $(MODULE_LIBS) ../../CommonUtilitiesLib/libCommonUtilitiesLib.a 
+ 
+ #OPTIMIZATION
+--- DarwinStreamingSrvr5.5.5-Source/MP3Broadcaster/Makefile.POSIX	2005-04-27 05:21:12.000000000 -0700
++++ DarwinStreamingSrvr5.5.5-Source/MP3Broadcaster/Makefile.POSIX.new	2008-02-07 18:39:41.000000000 -0800
+@@ -5,14 +5,14 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h $(INCLUDE_FLAG) ../revision.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h $(INCLUDE_FLAG) ../revision.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib ../CommonUtilitiesLib/libCommonUtilitiesLib.a
+ 
+ # internal printf
+ CCFLAGS += -D__USE_MAX_PRINTF__
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3 
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+--- DarwinStreamingSrvr5.5.5-Source/PlaylistBroadcaster.tproj/Makefile.POSIX	2005-04-27 05:21:12.000000000 -0700
++++ DarwinStreamingSrvr5.5.5-Source/PlaylistBroadcaster.tproj/Makefile.POSIX.new	2008-02-07 18:40:04.000000000 -0800
+@@ -5,14 +5,14 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h $(INCLUDE_FLAG) ../revision.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h $(INCLUDE_FLAG) ../revision.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib -lQTFileExternalLib ../CommonUtilitiesLib/libCommonUtilitiesLib.a ../QTFileLib/libQTFileExternalLib.a
+ 
+ # internal printf
+ CCFLAGS += -D__USE_MAX_PRINTF__
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+--- DarwinStreamingSrvr5.5.5-Source/QTFileTools/QTBroadcaster.tproj/Makefile.POSIX	2005-04-27 05:21:14.000000000 -0700
++++ DarwinStreamingSrvr5.5.5-Source/QTFileTools/QTBroadcaster.tproj/Makefile.POSIX.new	2008-02-07 18:40:26.000000000 -0800
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib  -lQTFileExternalLib ../../CommonUtilitiesLib/libCommonUtilitiesLib.a 
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
+--- DarwinStreamingSrvr5.5.5-Source/QTFileTools/QTFileInfo.tproj/Makefile.POSIX	2005-04-27 05:21:14.000000000 -0700
++++ DarwinStreamingSrvr5.5.5-Source/QTFileTools/QTFileInfo.tproj/Makefile.POSIX.new	2008-02-07 18:40:44.000000000 -0800
+@@ -5,11 +5,11 @@
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h -g -Wall
++CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS) -lCommonUtilitiesLib  -lQTFileExternalLib ../../CommonUtilitiesLib/libCommonUtilitiesLib.a
+ 
+ #OPTIMIZATION
+-CCFLAGS += -O3
++CCFLAGS +=
+ 
+ # EACH DIRECTORY WITH HEADERS MUST BE APPENDED IN THIS MANNER TO THE CCFLAGS
+ 
