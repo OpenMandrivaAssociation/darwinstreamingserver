@@ -1,8 +1,8 @@
 sources:
-  "DarwinStreamingSrvr6.0.3-Source.tar.lzma:"	deead03cc320d7586b442456b9470e24c1e1a8ce
-  "dss.bz2:"	3c5d2f75300932ce1c669f39d49bdfdf2062940e
-  "dss.init.bz2:"	7a10b4d3f13c1e37529c0b28eaa25a942ebe3124
-  "dss-proxy.bz2:"	cb7f0af56261ccabab9fee8d59235c00d287e34d
-  "dss-proxy.init.bz2:"	542e8c63aa3bd4186b3e4ec6467966fdafbf20da
-  "dss-setup-script.lzma:"	38ba1135bbc1f15a7d6fd1c2ec17b452f62aa83b
-  "dss.webadmin.init.lzma:"	4fef0a367bc3e84d0b6c6744d94fee5f91cdf2d3
+  DarwinStreamingSrvr6.0.3-Source.tar.lzma: deead03cc320d7586b442456b9470e24c1e1a8ce
+  dss-proxy.bz2: cb7f0af56261ccabab9fee8d59235c00d287e34d
+  dss-proxy.init.bz2: 542e8c63aa3bd4186b3e4ec6467966fdafbf20da
+  dss-setup-script.lzma: 38ba1135bbc1f15a7d6fd1c2ec17b452f62aa83b
+  dss.bz2: 3c5d2f75300932ce1c669f39d49bdfdf2062940e
+  dss.init.bz2: 7a10b4d3f13c1e37529c0b28eaa25a942ebe3124
+  dss.webadmin.init.lzma: 4fef0a367bc3e84d0b6c6744d94fee5f91cdf2d3

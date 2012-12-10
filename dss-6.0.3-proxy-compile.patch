@@ -1,0 +1,70 @@
+--- DarwinStreamingSrvr6.0.3-Source/StreamingProxy.tproj/BuildProxy.bero	2012-12-05 19:11:21.168211324 +0100
++++ DarwinStreamingSrvr6.0.3-Source/StreamingProxy.tproj/BuildProxy	2012-12-05 19:12:56.258998147 +0100
+@@ -13,9 +13,9 @@ case $PLAT in
+ 
+ 	Linux.ppc)
+ 		echo "Configuring for a Linux PPC platform"
+-		CPLUS='egcs'
+-		CCOMP=egcs
+-		LINKER='egcs'
++		CPLUS='gcc'
++		CCOMP=gcc
++		LINKER='gcc'
+ 		MACHDEFINES=-D__linuxppc__
+ 		PTHREADLIB=-lpthread
+ 		DLLIB=-ldl
+@@ -26,11 +26,12 @@ case $PLAT in
+ 		;;		
+ 
+ 	Linux.i586 | \
+-	Linux.i686)
++	Linux.i686 | \
++	Linux.x86_64)
+ 		echo "Configuring for a Linux x86 platform"
+-		CPLUS='egcs'
+-		CCOMP=egcs
+-		LINKER='egcs'
++		CPLUS='gcc'
++		CCOMP=gcc
++		LINKER='gcc'
+ 		MACHDEFINES=-D__linux__
+ 		DLLIB=-ldl
+ 		PTHREADLIB=-lpthread
+@@ -40,12 +41,12 @@ case $PLAT in
+ 		fi
+ 		;;
+ 
+-	Linux.mips)
+-		echo "Configuring for a Linux MIPS (Qube) platform"
++	Linux.mips|Linux.arm*)
++		echo "Configuring for a Linux ARM or MIPS (Qube) platform"
+ 		CPLUS='gcc'
+ 		CCOMP=gcc
+ 		LINKER='gcc'
+-		MACHDEFINES="-D__linux__ -fhandle-exceptions"
++		MACHDEFINES="-D__linux__ -fexceptions"
+ 		DLLIB=-ldl
+ 		PTHREADLIB=-lpthread
+ 		SHARED=-shared
+--- DarwinStreamingSrvr6.0.3-Source/StreamingProxy.tproj/Makefile.POSIX.bero	2012-12-05 19:13:14.607150365 +0100
++++ DarwinStreamingSrvr6.0.3-Source/StreamingProxy.tproj/Makefile.POSIX	2012-12-05 19:14:14.803648227 +0100
+@@ -5,7 +5,7 @@ NAME = StreamingProxy
+ C++ = $(CPLUS)
+ CC = $(CCOMP)
+ LINK = $(LINKER)
+-CCFLAGS += $(COMPILER_FLAGS) $(INCLUDE_FLAG) ../PlatformHeader.h
++CCFLAGS += $(COMPILER_FLAGS) -include ../PlatformHeader.h
+ LIBS = $(CORE_LINK_LIBS)
+ 
+ #OPTIMIZATION
+@@ -37,8 +37,8 @@ clean:
+ .SUFFIXES: .cpp .c .o
+ 
+ .cpp.o:
+-	$(C++) -c -o $*.o $(DEFINES) $(C++FLAGS) $*.cpp
++	$(C++) -o $*.o $(DEFINES) $(C++FLAGS) -c $*.cpp
+ 
+ .c.o:
+-	$(CC) -c -o $*.o $(DEFINES) $(CCFLAGS) $*.c
++	$(CC) -o $*.o $(DEFINES) $(CCFLAGS) -c $*.c
+ 

@@ -1,7 +1,44 @@
-diff -Naur DSS-v5_0_3_2/ReleaseNotes.txt DSS-v5_0_3_2.oden/ReleaseNotes.txt
---- DSS-v5_0_3_2/ReleaseNotes.txt	2003-03-13 02:26:42.000000000 +0100
-+++ DSS-v5_0_3_2.oden/ReleaseNotes.txt	2005-05-04 20:01:52.271342038 +0200
-@@ -526,7 +526,7 @@
+--- DarwinStreamingSrvr6.0.3-Source/qtaccess.config~	2007-11-16 06:17:59.000000000 +0100
++++ DarwinStreamingSrvr6.0.3-Source/qtaccess	2012-12-05 19:08:09.899626034 +0100
+@@ -22,19 +22,13 @@ AuthName "streaming server realm"
+ 
+ # AuthUserFile: The filename that contains the list of users
+ # for this access file 
+-# If not given, the default filename is /Library/QuickTimeStreaming/Config/qtusers for MacOSX
+-# If not given, the default filename is /etc/streaming/qtusers for POSIX
+ # usage: AuthUserFile <user filename>
+-#AuthUserFile /etc/streaming/qtusers
+-AuthUserFile /Library/QuickTimeStreaming/Config/qtusers
++AuthUserFile /etc/dss/qtusers
+ 
+ # AuthGroupFile: The filename that contains the groups and the 
+ # users that belong to each group
+-# If not given, the default filename is /Library/QuickTimeStreaming/Config/qtgroups for MacOSX
+-# If not given, the default filename is /etc/streaming/qtgroups for POSIX
+ # usage: AuthGroupFile  <group filename>
+-#AuthGroupFile  /etc/streaming/qtgroups
+-AuthGroupFile /Library/QuickTimeStreaming/Config/qtgroups
++AuthGroupFile /etc/dss/qtgroups
+ 
+ # require user: The names next to this specify which user 
+ # is allowed to access the media in this folder
+@@ -58,10 +52,11 @@ require group movie-watchers
+ # both. <Limit READ> can be omitted as the access keywords outside the
+ # Limit directive
+ # usage: <Limit [READ|WRITE] ..> ... </Limit>
++
+ <Limit WRITE>
+  AuthName "streaming server broadcaster realm"
+- AuthUserFile /Library/QuickTimeStreaming/Config/qtbroadcastusers
+- AuthGroupFile /Library/QuickTimeStreaming/Config/qtbroadcastgroups
++ AuthUserFile /etc/dss/qtbroadcastusers
++ AuthGroupFile /etc/dss/qtbroadcastgroups
+  require group broadcaster
+ </Limit>
+ 
+--- DarwinStreamingSrvr6.0.3-Source/ReleaseNotes.txt.config~	2007-11-16 06:17:59.000000000 +0100
++++ DarwinStreamingSrvr6.0.3-Source/ReleaseNotes.txt	2012-12-05 19:08:09.898626025 +0100
+@@ -526,7 +526,7 @@ cvs tag: qtssServer-393
  		     qtpasswd 4.0 [v392] built on: Nov 19 2001, 10:20:52
  		     Usage: qtpasswd [-F] [-f filename] [-c] [-r realm] [-p password] [-d] username
  		     -F   Don't ask for confirmation when deleting users or overwriting existing files.
@@ -10,29 +47,8 @@ diff -Naur DSS-v5_0_3_2/ReleaseNotes.txt DSS-v5_0_3_2.oden/ReleaseNotes.txt
  		     -c   Create new file.
  		     -r   The realm name to use when creating a new file via "-c" (Default is "Streaming Server").
  		     -p   Allows entry of password at command line rather than prompting for it.
-diff -Naur DSS-v5_0_3_2/StreamingProxy.tproj/StreamingProxy.html DSS-v5_0_3_2.oden/StreamingProxy.tproj/StreamingProxy.html
---- DSS-v5_0_3_2/StreamingProxy.tproj/StreamingProxy.html	2001-03-16 00:18:04.000000000 +0100
-+++ DSS-v5_0_3_2.oden/StreamingProxy.tproj/StreamingProxy.html	2005-05-04 20:01:52.272342061 +0200
-@@ -81,13 +81,13 @@
- 
- <OL>
-    <LI>Install the Streaming Proxy in a reasonable place on your
--   machine (For example, /usr/local/sbin ).</LI>
-+   machine (For example, /usr/sbin ).</LI>
-    
-    <LI>Edit the streamingproxy.conf file put place
--   it in the /etc/streaming/ directory.</LI>
-+   it in the /etc/dss/ directory.</LI>
-    
-    <LI>Launch the StreamingProxy application (ie.
--  <CODE> #/usr/local/sbin/StreamingProxy -c /etc/streaming/streamingproxy.conf</CODE>)</LI>
-+  <CODE> #/usr/sbin/StreamingProxy -c /etc/dss/streamingproxy.conf</CODE>)</LI>
-    
-     <LI>Launch the StreamingProxy application using the -h command line option for a description of the other
-    command line options.</LI>
-diff -Naur DSS-v5_0_3_2/StreamingProxy.tproj/streamingproxy.conf DSS-v5_0_3_2.oden/StreamingProxy.tproj/streamingproxy.conf
---- DSS-v5_0_3_2/StreamingProxy.tproj/streamingproxy.conf	2001-05-18 02:31:32.000000000 +0200
-+++ DSS-v5_0_3_2.oden/StreamingProxy.tproj/streamingproxy.conf	2005-05-04 20:01:52.272342061 +0200
+--- DarwinStreamingSrvr6.0.3-Source/StreamingProxy.tproj/streamingproxy.conf.config~	2007-11-16 06:16:39.000000000 +0100
++++ DarwinStreamingSrvr6.0.3-Source/StreamingProxy.tproj/streamingproxy.conf	2012-12-05 19:08:09.899626034 +0100
 @@ -2,19 +2,23 @@
  # proxy configuration file
  #
@@ -59,7 +75,7 @@ diff -Naur DSS-v5_0_3_2/StreamingProxy.tproj/streamingproxy.conf DSS-v5_0_3_2.od
  
  #
  # listen <address> <port-num>
-@@ -22,18 +26,18 @@
+@@ -22,18 +26,18 @@ users	150
  #        if <address> is not specified, it listens on all addresses
  #
  #listen 127.0.0.1 5540
@@ -82,113 +98,27 @@ diff -Naur DSS-v5_0_3_2/StreamingProxy.tproj/streamingproxy.conf DSS-v5_0_3_2.od
  #
 -#rtp-bind-addr 5.6.7.8
 +rtp-bind-addr 127.0.0.1
-diff -Naur DSS-v5_0_3_2/WebAdmin/streamingadminserver.conf DSS-v5_0_3_2.oden/WebAdmin/streamingadminserver.conf
---- DSS-v5_0_3_2/WebAdmin/streamingadminserver.conf	2001-08-10 22:29:43.000000000 +0200
-+++ DSS-v5_0_3_2.oden/WebAdmin/streamingadminserver.conf	2005-05-04 20:01:52.274342107 +0200
-@@ -1,32 +1,35 @@
- # Sample config file for Streaming Admin Server
--# for QuickTime Streaming Server on MacOS X
+--- DarwinStreamingSrvr6.0.3-Source/StreamingProxy.tproj/StreamingProxy.html.config~	2007-11-16 06:16:39.000000000 +0100
++++ DarwinStreamingSrvr6.0.3-Source/StreamingProxy.tproj/StreamingProxy.html	2012-12-05 19:08:09.899626034 +0100
+@@ -81,13 +81,13 @@ or another machine in your Perimeter Net
  
- # Port on which the streaming admin server listens for requests
- port=1220
- 
- # The root directory for all the html and cgi files
- # The path should be absolute
--root=/Library/QuickTimeStreaming/AdminHtml
-+root=/var/lib/dss/AdminHtml
- 
- # The root directory for play lists managed by the adminserver
- # The path should be absolute
--plroot=/Library/QuickTimeStreaming/Playlists
-+plroot=/var/lib/dss/Playlists
-+
-+# NOTE! You must set "host" and "qtssIPAddress" to the same
-+# values as the DarwinStreamingServer is listening to.
-+# Regards // Oden Eriksson
- 
- # The host name of the streaming admin server
--host=foo.bar.com
-+host=
- 
- # The ip address of the streaming server it has to administer
--qtssIPAddress=127.0.0.1
-+qtssIPAddress=
- 
- # The listening port of the streaming server it has to administer
- qtssPort=554
- 
- # The name of the streaming server binary
--qtssName=/usr/sbin/QuickTimeStreamingServer
-+qtssName=/usr/sbin/DarwinStreamingServer
- 
- # If set to 1, admin server will start qtss when it is launched
- # If set to 0, qtss will not be launched when the admin starts up
--qtssAutoStart=1
-+qtssAutoStart=0
- 
- # To add new mime types
- # If the suffix is xxx, and the
-@@ -41,7 +44,7 @@
- log=1
- 
- # The full path of the streaming admin server log file
--logfile=/Library/QuickTimeStreaming/Logs/streamingadminserver.log
-+logfile=/var/log/dss/StreamingAdminServer.log
- 
- # Number of hours before which logs are rolled
- logtime=168
-@@ -53,7 +56,5 @@
- # Movie's directory
- gbrowse=0
- 
--
--
--
--
-+# disable ssl per default
-+ssl=0
-diff -Naur DSS-v5_0_3_2/qtaccess DSS-v5_0_3_2.oden/qtaccess
---- DSS-v5_0_3_2/qtaccess	2001-11-03 00:44:44.000000000 +0100
-+++ DSS-v5_0_3_2.oden/qtaccess	2005-05-04 20:01:52.271342038 +0200
-@@ -22,19 +22,13 @@
- 
- # AuthUserFile: The filename that contains the list of users
- # for this access file 
--# If not given, the default filename is /Library/QuickTimeStreaming/Config/qtusers for MacOSX
--# If not given, the default filename is /etc/streaming/qtusers for POSIX
- # usage: AuthUserFile <user filename>
--#AuthUserFile /etc/streaming/qtusers
--AuthUserFile /Library/QuickTimeStreaming/Config/qtusers
-+AuthUserFile /etc/dss/qtusers
- 
- # AuthGroupFile: The filename that contains the groups and the 
- # users that belong to each group
--# If not given, the default filename is /Library/QuickTimeStreaming/Config/qtgroups for MacOSX
--# If not given, the default filename is /etc/streaming/qtgroups for POSIX
- # usage: AuthGroupFile  <group filename>
--#AuthGroupFile  /etc/streaming/qtgroups
--AuthGroupFile /Library/QuickTimeStreaming/Config/qtgroups
-+AuthGroupFile /etc/dss/qtgroups
- 
- # require user: The names next to this specify which user 
- # is allowed to access the media in this folder
-@@ -58,10 +52,11 @@
- # both. <Limit READ> can be omitted as the access keywords outside the
- # Limit directive
- # usage: <Limit [READ|WRITE] ..> ... </Limit>
-+
- <Limit WRITE>
-  AuthName "streaming server broadcaster realm"
-- AuthUserFile /Library/QuickTimeStreaming/Config/qtbroadcastusers
-- AuthGroupFile /Library/QuickTimeStreaming/Config/qtbroadcastgroups
-+ AuthUserFile /etc/dss/qtbroadcastusers
-+ AuthGroupFile /etc/dss/qtbroadcastgroups
-  require group broadcaster
- </Limit>
- 
-diff -Naur DSS-v5_0_3_2/streamingserver.xml DSS-v5_0_3_2.oden/streamingserver.xml
---- DSS-v5_0_3_2/streamingserver.xml	2003-04-09 02:30:38.000000000 +0200
-+++ DSS-v5_0_3_2.oden/streamingserver.xml	2005-05-04 20:01:52.273342084 +0200
+ <OL>
+    <LI>Install the Streaming Proxy in a reasonable place on your
+-   machine (For example, /usr/local/sbin ).</LI>
++   machine (For example, /usr/sbin ).</LI>
+    
+    <LI>Edit the streamingproxy.conf file put place
+-   it in the /etc/streaming/ directory.</LI>
++   it in the /etc/dss/ directory.</LI>
+    
+    <LI>Launch the StreamingProxy application (ie.
+-  <CODE> #/usr/local/sbin/StreamingProxy -c /etc/streaming/streamingproxy.conf</CODE>)</LI>
++  <CODE> #/usr/sbin/StreamingProxy -c /etc/dss/streamingproxy.conf</CODE>)</LI>
+    
+     <LI>Launch the StreamingProxy application using the -h command line option for a description of the other
+    command line options.</LI>
+--- DarwinStreamingSrvr6.0.3-Source/streamingserver.xml.config~	2008-03-26 01:42:51.000000000 +0100
++++ DarwinStreamingSrvr6.0.3-Source/streamingserver.xml	2012-12-05 19:08:09.899626034 +0100
 @@ -79,16 +79,16 @@
  	<PREF NAME="error_logfile_interval" TYPE="UInt32">7</PREF>
  
@@ -240,7 +170,7 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml DSS-v5_0_3_2.oden/streamingserver.xm
  
  	<!-- Name of the access log file. -->
  	<PREF NAME="request_logfile_name">StreamingServer</PREF>
-@@ -362,7 +362,7 @@
+@@ -365,7 +365,7 @@
      <PREF NAME="mp3_request_logfile_name" >mp3_access</PREF>
      
  	<!-- Path to directory where access logs are stored. -->
@@ -249,7 +179,7 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml DSS-v5_0_3_2.oden/streamingserver.xm
  
  	<!-- Either "true" or "false". This toggles -->
  	<!-- mp3 access logging on and off. -->
-@@ -394,14 +394,14 @@
+@@ -397,14 +397,14 @@
  	<PREF NAME="http_xfer_enabled" TYPE="Bool16" >false</PREF>
  	<!-- Path to the http download folder. All files -->
  	<!-- that are requested from this folder are sent via HTTP -->
@@ -266,7 +196,7 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml DSS-v5_0_3_2.oden/streamingserver.xm
  	<!-- Maximum allowed size in bytes for the http module log. A -->
  	<!-- value of 0 means unlimited. -->
  	<PREF NAME="http_logfile_size" TYPE="UInt32">256000</PREF>
-@@ -516,7 +516,7 @@
+@@ -519,7 +519,7 @@
  <MODULE NAME="QTSSRelayModule">
  	<!-- Relay preferences file. This file should be in the documented .rcf (Relay config file) -->
  	<!-- format. The Relay will use this to load up all relay streams -->
@@ -275,7 +205,7 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml DSS-v5_0_3_2.oden/streamingserver.xm
  
  	<!-- enter this URL into a web browser and get a web page with current stats on -->
  	<!-- your active relays -->
-@@ -528,10 +528,10 @@
+@@ -531,10 +531,10 @@
  	<PREF NAME="modAccess_qtaccessfilename">qtaccess</PREF>
  
  	<!-- The default path and file name for the AccessModule's groups list -->
@@ -288,10 +218,9 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml DSS-v5_0_3_2.oden/streamingserver.xm
  </MODULE>
  
  <MODULE NAME="QTSSAdminModule">
-diff -Naur DSS-v5_0_3_2/streamingserver.xml-POSIX DSS-v5_0_3_2.oden/streamingserver.xml-POSIX
---- DSS-v5_0_3_2/streamingserver.xml-POSIX	2003-04-09 02:30:38.000000000 +0200
-+++ DSS-v5_0_3_2.oden/streamingserver.xml-POSIX	2005-05-04 20:01:52.273342084 +0200
-@@ -79,7 +79,7 @@
+--- DarwinStreamingSrvr6.0.3-Source/streamingserver.xml-POSIX.config~	2008-03-26 01:42:51.000000000 +0100
++++ DarwinStreamingSrvr6.0.3-Source/streamingserver.xml-POSIX	2012-12-05 19:08:27.445771614 +0100
+@@ -79,16 +79,16 @@
  	<PREF NAME="error_logfile_interval" TYPE="UInt32">7</PREF>
  
  	<!-- error log. A value of 0 means unlimited. -->
@@ -300,15 +229,17 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml-POSIX DSS-v5_0_3_2.oden/streamingser
  
  	<!-- Name of the error log file. -->
  	<PREF NAME="error_logfile_name">Error</PREF>
-@@ -88,7 +88,7 @@
-     <PREF NAME="pid_file">/var/run/DarwinStreamingServer.pid</PREF>
+ 
+ 	<!-- Path to the pid file. Mac OSX and Darwin unixes only. -->
+-    <PREF NAME="pid_file">/var/run/DarwinStreamingServer.pid</PREF>
++	<PREF NAME="pid_file">/var/run/DarwinStreamingServer.pid</PREF>
  
  	<!-- Path to the folder containing dynamic loadable server modules -->
 -	<PREF NAME="module_folder">/usr/local/sbin/StreamingServerModules</PREF>
 +	<PREF NAME="module_folder">/usr/lib/dss</PREF>
  
- 	<!-- If the server discovers it is serving more than its -->
- 	<!-- allowed maximum bandwidth (using the average bandwidth computation) it -->
+ 	<!-- If this is true, the server will allow streaming of files that have invalid hint track references -->
+ 	<PREF NAME="allow_invalid_hint_track_refs" TYPE="Bool16">false</PREF>
 @@ -121,7 +121,7 @@
  	<PREF NAME="bind_ip_addr">0</PREF>
  
@@ -318,7 +249,7 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml-POSIX DSS-v5_0_3_2.oden/streamingser
  
  	<!-- Maximum amount of bandwidth the server is allowed to serve. -->
  	<!-- value is in kilobits/sec. While this limit is exceeded, new client requests. -->
-@@ -293,7 +293,7 @@
+@@ -297,7 +297,7 @@
  	<PREF NAME="request_logfile_size" TYPE="UInt32">10240000</PREF>
  
  	<!-- Path to directory where access logs are stored. -->
@@ -327,7 +258,7 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml-POSIX DSS-v5_0_3_2.oden/streamingser
  
  	<!-- Name of the access log file. -->
  	<PREF NAME="request_logfile_name">StreamingServer</PREF>
-@@ -364,7 +364,7 @@
+@@ -371,7 +371,7 @@
      <PREF NAME="mp3_request_logfile_name" >mp3_access</PREF>
      
  	<!-- Path to directory where access logs are stored. -->
@@ -336,7 +267,7 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml-POSIX DSS-v5_0_3_2.oden/streamingser
  
  	<!-- Either "true" or "false". This toggles -->
  	<!-- mp3 access logging on and off. -->
-@@ -396,14 +396,14 @@
+@@ -403,14 +403,14 @@
  	<PREF NAME="http_xfer_enabled" TYPE="Bool16" >false</PREF>
  	<!-- Path to the http download folder. All files -->
  	<!-- that are requested from this folder are sent via HTTP -->
@@ -353,7 +284,7 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml-POSIX DSS-v5_0_3_2.oden/streamingser
  	<!-- Maximum allowed size in bytes for the http module log. A -->
  	<!-- value of 0 means unlimited. -->
  	<PREF NAME="http_logfile_size" TYPE="UInt32">256000</PREF>
-@@ -518,7 +518,7 @@
+@@ -525,7 +525,7 @@
  <MODULE NAME="QTSSRelayModule">
  	<!-- Relay preferences file. This file should be in the documented .rcf (Relay config file) -->
  	<!-- format. The Relay will use this to load up all relay streams -->
@@ -362,7 +293,7 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml-POSIX DSS-v5_0_3_2.oden/streamingser
  
  	<!-- enter this URL into a web browser and get a web page with current stats on -->
  	<!-- your active relays -->
-@@ -530,10 +530,10 @@
+@@ -537,10 +537,10 @@
  	<PREF NAME="modAccess_qtaccessfilename">qtaccess</PREF>
  
  	<!-- The default path and file name for the AccessModule's groups list -->
@@ -375,3 +306,67 @@ diff -Naur DSS-v5_0_3_2/streamingserver.xml-POSIX DSS-v5_0_3_2.oden/streamingser
  </MODULE>
  
  <MODULE NAME="QTSSAdminModule">
+--- DarwinStreamingSrvr6.0.3-Source/WebAdmin/streamingadminserver.conf.config~	2007-11-16 06:16:39.000000000 +0100
++++ DarwinStreamingSrvr6.0.3-Source/WebAdmin/streamingadminserver.conf	2012-12-05 19:08:09.899626034 +0100
+@@ -1,32 +1,35 @@
+ # Sample config file for Streaming Admin Server
+-# for QuickTime Streaming Server on MacOS X
+ 
+ # Port on which the streaming admin server listens for requests
+ port=1220
+ 
+ # The root directory for all the html and cgi files
+ # The path should be absolute
+-root=/Library/QuickTimeStreaming/AdminHtml
++root=/var/lib/dss/AdminHtml
+ 
+ # The root directory for play lists managed by the adminserver
+ # The path should be absolute
+-plroot=/Library/QuickTimeStreaming/Playlists
++plroot=/var/lib/dss/Playlists
++
++# NOTE! You must set "host" and "qtssIPAddress" to the same
++# values as the DarwinStreamingServer is listening to.
++# Regards // Oden Eriksson
+ 
+ # The host name of the streaming admin server
+-host=foo.bar.com
++host=
+ 
+ # The ip address of the streaming server it has to administer
+-qtssIPAddress=127.0.0.1
++qtssIPAddress=
+ 
+ # The listening port of the streaming server it has to administer
+ qtssPort=554
+ 
+ # The name of the streaming server binary
+-qtssName=/usr/sbin/QuickTimeStreamingServer
++qtssName=/usr/sbin/DarwinStreamingServer
+ 
+ # If set to 1, admin server will start qtss when it is launched
+ # If set to 0, qtss will not be launched when the admin starts up
+-qtssAutoStart=1
++qtssAutoStart=0
+ 
+ # To add new mime types
+ # If the suffix is xxx, and the
+@@ -41,7 +44,7 @@ realm=Streaming Admin Server
+ log=1
+ 
+ # The full path of the streaming admin server log file
+-logfile=/Library/QuickTimeStreaming/Logs/streamingadminserver.log
++logfile=/var/log/dss/StreamingAdminServer.log
+ 
+ # Number of hours before which logs are rolled
+ logtime=168
+@@ -53,7 +56,5 @@ denyfile=\.pl$
+ # Movie's directory
+ gbrowse=0
+ 
+-
+-
+-
+-
++# disable ssl per default
++ssl=0

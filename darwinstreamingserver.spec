@@ -3,7 +3,7 @@
 Summary:	Apple's Darwin Streaming Server
 Name:		darwinstreamingserver
 Version:	6.0.3
-Release:	%{mkrel 2}
+Release:	3
 License:	APSL 2.0
 Group:		System/Servers
 URL:		http://developer.apple.com/opensource/server/streaming/index.html
@@ -27,8 +27,8 @@ Patch1:		dss-6.0.3.patch
 # Horace Hsieh.
 Patch2:		dss-hh-20080728-1.patch
 Patch3:		darwinstreamingserver-6.0.3-build_optimizer.patch
+Patch4:		dss-6.0.3-proxy-compile.patch
 BuildRequires:	libstdc++-devel
-BuildRoot:	%{_tmppath}/%{name}-buildroot
 Requires(pre,post,preun,postun):	rpm-helper
 
 %description
@@ -132,10 +132,11 @@ Darwin Streaming Server.
 
 %prep
 %setup -q -n %{oname}%{version}-Source
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch0 -p1 -b .config~
+%patch1 -p1 -b .linux~
+%patch2 -p1 -b .leaks~
+%patch3 -p1 -b .optimize~
+%patch4 -p1 -b .proxycompile~
 # fix qtpasswd resetting ownership of its config files to root - AdamW
 # 2008/11
 sed -i -e 's,"qtss","dss",g' qtpasswd.tproj/QTSSPasswd.cpp
@@ -157,6 +158,8 @@ export ARCH="%{_target_cpu}"
 # export JOBS=$(echo %{_smp_mflags}|cut -dj -f2)
 # ./Buildit --jobs=$JOBS
 ./Buildit
+cd StreamingProxy.tproj
+./BuildProxy
 
 %install
 [ "%{buildroot}" != "/" ] && rm -rf %{buildroot}
@@ -368,8 +371,6 @@ strip %{buildroot}%{_libdir}/dss/*
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/dss/streamingproxy.conf.default
 %config(noreplace) %attr(0644,root,root) %{_sysconfdir}/logrotate.d/%{name}-Proxy
 %dir %attr(0755, root, root) %{_sbindir}/StreamingProxy
-%dir %attr(0755, root, root) %{_localstatedir}/lib/dss/Config
-%dir %attr(0755, dss, dss) %{_localstatedir}/lib/dss/Logs
 %dir %attr(0755, dss, dss) %{_logdir}/dss
 %attr(0644,dss,dss) %verify(not md5 size mtime) %ghost %{_logdir}/dss/StreamingProxy.log
 
@@ -393,3 +394,41 @@ strip %{buildroot}%{_libdir}/dss/*
 %attr(0755,root,root) %{_initrddir}/streamingadminserver
 %config(noreplace) %{_sysconfdir}/dss/streamingadminserver.conf
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %{_logdir}/dss/streamingadminserver.log
+
+
+%changelog
+* Sat Nov 29 2008 Adam Williamson <awilliamson@mandriva.com> 6.0.3-2mdv2009.1
++ Revision: 307860
+- add a README.urpmi file with quick setup instructions
+- use %%_logdir instead of /var/log
+- stop qtpasswd resetting ownership of its config files to root.root/0600
+- make the dss initscript use SIGKILL to stop the service (SIGTERM doesn't work)
+- add an initscript for the web admin interface
+- add the web admin interface stuff in a new sub-package
+- add a small script to create an account (ripped from upstream Install)
+
+* Fri Aug 29 2008 Adam Williamson <awilliamson@mandriva.com> 6.0.3-1mdv2009.0
++ Revision: 277423
+- small fix to docs in file list
+- don't always use -fPIC, patches enable it for x86-64 where it's needed
+- enable x86-64 build, external patches fix it
+- rediff build_optimizer.patch (for new version and external patches)
+- add dss-6.0.3.patch and dss-hh-20080728-1.patch from upstream bug report
+  to fix various build problems and bugs on Linux and x86-64
+- rediff Config.diff
+- download no longer behind a password (yay)
+- new release 6.0.3
+
+* Wed Jul 23 2008 Thierry Vignaud <tvignaud@mandriva.com> 5.5.5-3mdv2009.0
++ Revision: 243961
+- rebuild
+
+  + Pixel <pixel@mandriva.com>
+    - adapt to %%_localstatedir now being /var instead of /var/lib (#22312)
+
+* Fri Feb 08 2008 Adam Williamson <awilliamson@mandriva.com> 5.5.5-1mdv2008.1
++ Revision: 163939
+- only build i586 (code is extensively broken for x86-64 and no-one anywhere seems to care about fixing it; only FreeBSD also package this, and they've just done the same, tagging the x86-64 build as a failure)
+- import darwinstreamingserver
+
+
