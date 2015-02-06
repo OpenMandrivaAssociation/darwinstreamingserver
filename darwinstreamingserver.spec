@@ -3,7 +3,7 @@
 Summary:	Apple's Darwin Streaming Server
 Name:		darwinstreamingserver
 Version:	6.0.3
-Release:	3
+Release:	4
 License:	APSL 2.0
 Group:		System/Servers
 URL:		http://developer.apple.com/opensource/server/streaming/index.html
