@@ -6,7 +6,7 @@ Version:	6.0.3
 Release:	4
 License:	APSL 2.0
 Group:		System/Servers
-URL:		http://developer.apple.com/opensource/server/streaming/index.html
+URL:		https://developer.apple.com/opensource/server/streaming/index.html
 # Upstream download is uncompressed, compress manually - AdamW 2008/08
 Source0:	http://dss.macosforge.org/downloads/%{oname}%{version}-Source.tar.lzma
 Source1:	dss.init.bz2
